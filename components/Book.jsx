@@ -11,20 +11,33 @@ import {
 	Col,
 	Space,
 	Image,
+	Skeleton,
+	notification,
+	Typography,
+	Divider,
 } from "antd";
 import { TagsOutlined, BookOutlined } from "@ant-design/icons";
 
 const Book = () => {
-	const [book, setBook] = useState();
+	const [book, setBook] = useState({
+		volumeInfo: { imageLinks: "", authors: [], categories: [] },
+	});
 	const [isbn, setISBN] = useState("0747532699");
 	const [loading, setLoading] = useState(true);
-	const { Meta } = Card;
+	const { Title } = Typography;
 
 	useEffect(() => {
 		axios
 			.get(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`)
 			.then((res) => {
-				setBook(res.data.items[0]);
+				res.data.totalItems
+					? setBook(res.data.items[0])
+					: notification.error({
+							message: "Check ISBN",
+							description:
+								"The ISBN you entered is incorrect. Please check",
+					  });
+
 				setLoading(false);
 			})
 			.catch((err) => {
@@ -38,7 +51,7 @@ const Book = () => {
 	};
 
 	return (
-		<main>
+		<main style={{ width: "95%" }}>
 			<Row justify={"center"}>
 				<Col span={24} md={{ span: 16 }}>
 					<Form onFinish={onSubmit} size={"large"}>
@@ -63,9 +76,13 @@ const Book = () => {
 					</Form>
 					<br />
 
-					{!loading && (
-						<Card title={book.volumeInfo.title} bordered={true}>
-							<Row gutter={[16, 16]} align={"middle"}>
+					<Card>
+						<Skeleton loading={loading} active>
+							<Title level={4} style={{ textAlign: "center" }}>
+								{book.volumeInfo.title}
+							</Title>
+							<Divider />
+							<Row gutter={[16, 32]} align={"middle"}>
 								<Col
 									span={24}
 									md={8}
@@ -75,18 +92,20 @@ const Book = () => {
 										src={
 											book.volumeInfo.imageLinks.thumbnail
 										}
+										width={"70%"}
 									/>
 								</Col>
 								<Col span={24} md={16}>
-									<p>
+									<div style={{ marginBottom: "1em" }}>
 										<Space>
 											<BookOutlined />
 											{book.volumeInfo.authors.map(
 												(author) => author
 											)}
 										</Space>
-									</p>
-									<p>
+									</div>
+
+									<div style={{ marginBottom: "1em" }}>
 										<Space>
 											<TagsOutlined />
 											{book.volumeInfo.categories.map(
@@ -95,7 +114,7 @@ const Book = () => {
 												)
 											)}
 										</Space>
-									</p>
+									</div>
 
 									<Rate
 										disabled
@@ -106,12 +125,19 @@ const Book = () => {
 										style={{ marginBottom: "1em" }}
 									/>
 									<p>{book.volumeInfo.description}</p>
-
-									<Button> </Button>
+									<br />
+									<Button
+										href={book.volumeInfo.previewLink}
+										target="_blank"
+										type={"primary"}
+										size={"large"}
+									>
+										View on Google Books
+									</Button>
 								</Col>
 							</Row>
-						</Card>
-					)}
+						</Skeleton>
+					</Card>
 				</Col>
 			</Row>
 		</main>
