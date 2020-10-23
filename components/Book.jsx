@@ -51,22 +51,28 @@ const Book = () => {
 	};
 
 	return (
-		<main style={{ width: "95%" }}>
+		<main style={{ width: "95%", padding: "5rem 0" }}>
 			<Row justify={"center"}>
 				<Col span={24} md={{ span: 16 }}>
 					<Form onFinish={onSubmit} size={"large"}>
-						<Row gutter={16}>
-							<Col span={24} md={12}>
+						<Row
+							gutter={16}
+							style={{ maxWidth: "600px", margin: "0 auto" }}
+						>
+							<Col span={24} md={{ span: 16 }}>
 								<Form.Item label="ISBN" name="isbn">
 									<Input size="large" value={isbn} />
 								</Form.Item>
 							</Col>
-							<Col span={24} md={12}>
+							<Col span={24} md={{ span: 8 }}>
 								<Form.Item>
 									<Button
 										type="primary"
 										htmlType="submit"
 										size="large"
+										style={{
+											width: "100%",
+										}}
 									>
 										Enter
 									</Button>
